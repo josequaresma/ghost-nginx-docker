@@ -1,0 +1,35 @@
+data-blog:  
+ build: ./data-blog
+ container_name: "data-blog"
+
+mariadb:  
+ image: mariadb
+ container_name: "mariadb"
+ env_file: ./data-blog/env_blog
+ environment:
+  - TERM=xterm
+ ports:
+  - "127.0.0.1:3306:3306"
+ volumes_from:
+  - data-blog
+
+nginx:  
+ image: jwilder/nginx-proxy
+ container_name: "nginx"
+ ports: 
+  - "80:80"
+ volumes:
+  - /var/run/docker.sock:/tmp/docker.sock
+
+blog:  
+ image: ghost
+ container_name: "blog"
+ volumes:
+  - ./data-blog/config.js:/var/lib/ghost/config.js
+ volumes_from:
+  - data-blog
+ environment:
+  - VIRTUAL_HOST=hostname
+ env_file: ./data-blog/env_blog
+ links:
+  - mariadb:mysql
