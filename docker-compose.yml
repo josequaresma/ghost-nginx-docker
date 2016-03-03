@@ -18,8 +18,21 @@ nginx:
  container_name: "nginx"
  ports: 
   - "80:80"
+  - "443:443" 
  volumes:
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /etc/nginx/vhost.d
+  - /usr/share/nginx/html
   - /var/run/docker.sock:/tmp/docker.sock
+
+letsencrypt:
+ image: jrcs/letsencrypt-nginx-proxy-companion
+ container_name: "letsencrypt"
+ volumes:
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /var/run/docker.sock:/var/run/docker.sock
+ volumes_from:
+  - nginx
 
 blog:  
  image: ghost
@@ -29,7 +42,18 @@ blog:
  volumes_from:
   - data-blog
  environment:
-  - VIRTUAL_HOST=hostname
+  - VIRTUAL_HOST=hostnames
+  - NODE_ENV=production
+  - LETSENCRYPT_HOST=hostnames
+  - LETSENCRYPT_EMAIL=email
  env_file: ./data-blog/env_blog
  links:
   - mariadb:mysql
+# Ghost Backup
+backup-blog:  
+ image: bennetimo/ghost-backup
+ container_name: "backup-blog"
+ links:
+  - mariadb:mysql
+ volumes_from:
+  - data-blog
