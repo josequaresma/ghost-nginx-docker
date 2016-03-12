@@ -1,5 +1,9 @@
+# Domain configuration
+DOMAIN=example.com
+EMAIL=contact@example.com
+
 # Ghost configuration
-URL=http://www.j-q.co
+URL=http://www.${DOMAIN}
 
 # MariaDB configuration
 MYSQL_ROOT_PASSWORD=password  
@@ -10,5 +14,5 @@ MYSQL_DATABASE=blog
 #For email
 MAIL_SERVICE=Mailgun
 MAIL_TRANSPORT=SMTP
-MAIL_USER=postmaster@sandbox47336f59305d4d1d987de148c80e6119.mailgun.org
-MAIL_PASS=45f62618be3be488fa76e4328cbdc5f9 
+MAIL_USER=user@mailgun.org
+MAIL_PASS=password 
