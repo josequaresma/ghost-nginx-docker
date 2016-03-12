@@ -76,7 +76,7 @@ letsencrypt:
  volumes_from:
   - nginx
 
-ghost:  
+ghost:    
  image: ghost
  container_name: "ghost"
  volumes:
