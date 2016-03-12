@@ -42,10 +42,10 @@ blog:
  volumes_from:
   - data-blog
  environment:
-  - VIRTUAL_HOST=hostnames
+  - VIRTUAL_HOST=www.josequaresma.com
   - NODE_ENV=production
-  - LETSENCRYPT_HOST=hostnames
-  - LETSENCRYPT_EMAIL=email
+  - LETSENCRYPT_HOST=www.josequaresma.com
+  - LETSENCRYPT_EMAIL=contact@josequaresma.com
  env_file: ./data-blog/env_blog
  links:
   - mariadb:mysql
