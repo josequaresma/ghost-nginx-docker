@@ -1,8 +1,0 @@
-# Ghost configuration
-URL=http://hostname
-
-# MariaDB configuration
-MYSQL_ROOT_PASSWORD=password  
-MYSQL_USER=jose
-MYSQL_PASSWORD=password 
-MYSQL_DATABASE=blog  
