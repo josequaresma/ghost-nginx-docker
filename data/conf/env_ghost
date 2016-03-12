@@ -1,0 +1,14 @@
+# Ghost configuration
+URL=http://www.j-q.co
+
+# MariaDB configuration
+MYSQL_ROOT_PASSWORD=password  
+MYSQL_USER=jose
+MYSQL_PASSWORD=password 
+MYSQL_DATABASE=blog
+
+#For email
+MAIL_SERVICE=Mailgun
+MAIL_TRANSPORT=SMTP
+MAIL_USER=postmaster@sandbox47336f59305d4d1d987de148c80e6119.mailgun.org
+MAIL_PASS=45f62618be3be488fa76e4328cbdc5f9 

@@ -1,35 +1,101 @@
-data-blog:  
- build: ./data-blog
- container_name: "data-blog"
+influxdbData:
+  image: tutum/influxdb:0.9
+  volumes:
+    - ./data/influxdb:/data
+
+influxdb:
+  container_name: "influxdb"
+  image: tutum/influxdb:0.9
+  restart: always
+  environment:
+    - PRE_CREATE_DB=cadvisor
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+  expose:
+    - "8090"
+    - "8099"
+  volumes_from:
+    - influxdbData
+
+cadvisor:
+  container_name: "cadvisor"
+  image: google/cadvisor:v0.20.5
+  links:
+    - influxdb:influxsrv
+  command: -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influxsrv:8086
+  restart: always
+  ports:
+    - "8080:8080"
+  volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+  environment:
+    - VIRTUAL_HOST=monitor.${DOMAIN}
+    - LETSENCRYPT_HOST=monitor.${DOMAIN}
+    - LETSENCRYPT_EMAIL=${EMAIL}
+
+ghostData:
+ image: ghost
+ container_name: "ghostData"
+ volumes:
+  - ./data/mysql:/var/lib/mysql
+  - ./data/ghost:/var/lib/ghost
 
 mariadb:  
  image: mariadb
  container_name: "mariadb"
- env_file: ./data-blog/env_blog
+ env_file: ./data/conf/env_ghost
  environment:
   - TERM=xterm
  ports:
   - "127.0.0.1:3306:3306"
  volumes_from:
-  - data-blog
+  - ghostData
 
 nginx:  
  image: jwilder/nginx-proxy
  container_name: "nginx"
  ports: 
   - "80:80"
+  - "443:443"
  volumes:
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /etc/nginx/vhost.d
+  - /usr/share/nginx/html
   - /var/run/docker.sock:/tmp/docker.sock
 
-blog:  
- image: ghost
- container_name: "blog"
+letsencrypt:
+ image: jrcs/letsencrypt-nginx-proxy-companion
+ container_name: "letsencrypt"
  volumes:
-  - ./data-blog/config.js:/var/lib/ghost/config.js
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /var/run/docker.sock:/var/run/docker.sock
  volumes_from:
-  - data-blog
+  - nginx
+
+ghost:  
+ image: ghost
+ container_name: "ghost"
+ volumes:
+  - ./data/conf/config.js:/var/lib/ghost/config.js
+ volumes_from:
+  - blogData
  environment:
-  - VIRTUAL_HOST=hostname
- env_file: ./data-blog/env_blog
+  - VIRTUAL_HOST=www.${DOMAIN},${DOMAIN}
+  - NODE_ENV=production
+  - LETSENCRYPT_HOST=www.${DOMAIN},${DOMAIN}
+  - LETSENCRYPT_EMAIL=${EMAIL}
+ env_file: ./data/conf/env_ghost
  links:
   - mariadb:mysql
+
+ghost-backup:  
+ image: bennetimo/ghost-backup
+ container_name: "ghost-backup"
+ links:
+  - mariadb:mysql
+ volumes_from:
+  - blogData
