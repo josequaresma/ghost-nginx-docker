@@ -1,6 +1,24 @@
+ghostData:
+ image: ghost
+ container_name: "ghostData"
+ volumes:
+  - ./data/mysql:/var/lib/mysql
+  - ./data/ghost:/var/lib/ghost
+
+mariadb:  
+ image: mariadb
+ container_name: "mariadb"
+ env_file: ./data/conf/env_ghost
+ environment:
+  - TERM=xterm
+ ports:
+  - "127.0.0.1:3306:3306"
+ volumes_from:
+  - ghostData
+
 influxdbData:
-  image: tutum/influxdb:0.9
   container_name: "influxdbData"
+  image: tutum/influxdb:0.9
   volumes:
     - ./data/influxdb:/data
 
@@ -38,45 +56,6 @@ cadvisor:
     - LETSENCRYPT_HOST=monitor.${DOMAIN}
     - LETSENCRYPT_EMAIL=${EMAIL}
 
-ghostData:
- image: ghost
- container_name: "ghostData"
- volumes:
-  - ./data/mysql:/var/lib/mysql
-  - ./data/ghost:/var/lib/ghost
-
-mariadb:  
- image: mariadb
- container_name: "mariadb"
- env_file: ./data/conf/env_ghost
- environment:
-  - TERM=xterm
- ports:
-  - "127.0.0.1:3306:3306"
- volumes_from:
-  - ghostData
-
-nginx:  
- image: jwilder/nginx-proxy
- container_name: "nginx"
- ports: 
-  - "80:80"
-  - "443:443"
- volumes:
-  - /etc/letsencrypt/certs:/etc/nginx/certs
-  - /etc/nginx/vhost.d
-  - /usr/share/nginx/html
-  - /var/run/docker.sock:/tmp/docker.sock
-
-letsencrypt:
- image: jrcs/letsencrypt-nginx-proxy-companion
- container_name: "letsencrypt"
- volumes:
-  - /etc/letsencrypt/certs:/etc/nginx/certs
-  - /var/run/docker.sock:/var/run/docker.sock
- volumes_from:
-  - nginx
-
 ghost:    
  image: bennetimo/ghost-wait-mysql
  container_name: "ghost"
@@ -100,3 +79,24 @@ ghost-backup:
   - mariadb:mysql
  volumes_from:
   - ghostData
+
+letsencrypt:
+ image: jrcs/letsencrypt-nginx-proxy-companion
+ container_name: "letsencrypt"
+ volumes:
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /var/run/docker.sock:/var/run/docker.sock
+ volumes_from:
+  - nginx
+
+nginx:  
+ image: jwilder/nginx-proxy
+ container_name: "nginx"
+ ports: 
+  - "80:80"
+  - "443:443"
+ volumes:
+  - /etc/letsencrypt/certs:/etc/nginx/certs
+  - /etc/nginx/vhost.d
+  - /usr/share/nginx/html
+  - /var/run/docker.sock:/tmp/docker.sock
