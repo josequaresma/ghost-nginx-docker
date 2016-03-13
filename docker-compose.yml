@@ -57,8 +57,9 @@ cadvisor:
     - LETSENCRYPT_EMAIL=${EMAIL}
 
 ghost:    
- image: bennetimo/ghost-wait-mysql
+ image: ghost
  container_name: "ghost"
+ restart: always
  volumes:
   - ./data/conf/config.js:/var/lib/ghost/config.js
  volumes_from:
