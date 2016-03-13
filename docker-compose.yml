@@ -1,5 +1,6 @@
 influxdbData:
   image: tutum/influxdb:0.9
+  container_name: "influxdbData"
   volumes:
     - ./data/influxdb:/data
 
@@ -77,12 +78,12 @@ letsencrypt:
   - nginx
 
 ghost:    
- image: ghost
+ image: bennetimo/ghost-wait-mysql
  container_name: "ghost"
  volumes:
   - ./data/conf/config.js:/var/lib/ghost/config.js
  volumes_from:
-  - blogData
+  - ghostData
  environment:
   - VIRTUAL_HOST=www.${DOMAIN},${DOMAIN}
   - NODE_ENV=production
@@ -98,4 +99,4 @@ ghost-backup:
  links:
   - mariadb:mysql
  volumes_from:
-  - blogData
+  - ghostData

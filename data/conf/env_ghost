@@ -1,9 +1,9 @@
 # Domain configuration
-DOMAIN=example.com
-EMAIL=contact@example.com
+export DOMAIN=www.josequaresma.com
+export EMAIL=contact@josequaresma.com
 
 # Ghost configuration
-URL=http://www.${DOMAIN}
+URL=http://www.josequaresma.com
 
 # MariaDB configuration
 MYSQL_ROOT_PASSWORD=password  
