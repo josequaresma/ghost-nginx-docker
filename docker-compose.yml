@@ -4,6 +4,7 @@ ghostData:
  volumes:
   - ./data/mysql:/var/lib/mysql
   - ./data/ghost:/var/lib/ghost
+ entrypoint: /bin/bash
 
 mariadb:  
  image: mariadb
@@ -21,6 +22,7 @@ influxdbData:
   image: tutum/influxdb:0.9
   volumes:
     - ./data/influxdb:/data
+  entrypoint: /bin/bash
 
 influxdb:
   container_name: "influxdb"

@@ -1,18 +1,18 @@
 # Domain configuration
-export DOMAIN=example.com
-export EMAIL=contact@example.com
+export DOMAIN=j-q.co
+export EMAIL=contact@josequaresma.com
 
 # Ghost configuration
-URL=http://www.example.com
+URL=http://www.j-q.co
 
 # MariaDB configuration
-MYSQL_ROOT_PASSWORD=password  
-MYSQL_USER=user
-MYSQL_PASSWORD=password 
+MYSQL_ROOT_PASSWORD=password12345 
+MYSQL_USER=mysqluser
+MYSQL_PASSWORD=12345password
 MYSQL_DATABASE=ghost
 
 #For email
 MAIL_SERVICE=Mailgun
 MAIL_TRANSPORT=SMTP
-MAIL_USER=postmaster@mailgun.org
-MAIL_PASS=password
+MAIL_USER=postmaster@j-q.co
+MAIL_PASS=06ed5f956f10ea65882fde05d06b5a0d
