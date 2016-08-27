@@ -6,6 +6,35 @@ ghostData:
   - ./data/ghost:/var/lib/ghost
  entrypoint: /bin/bash
 
+ghostBackupData:
+ image: bennetimo/ghost-backup
+ container_name: "ghostBackupData"
+ volumes:
+  - ./data/backups:/backups
+ entrypoint: /bin/bash
+
+piwikData:
+ image: benhutchins/piwik
+ container_name: "piwikData"
+ volumes:
+  - ./data/piwik/config:/var/www/html/config
+ entrypoint: /bin/bash
+
+piwik:
+  image: benhutchins/piwik
+  container_name: piwik
+  restart: always
+  links:
+    - mariadb:mysql
+  ports:
+    - 8006:80
+  volumes_from:
+    - piwikData
+  environment:
+    - VIRTUAL_HOST=analytics.${DOMAIN}
+    - LETSENCRYPT_HOST=analytics.${DOMAIN}
+    - LETSENCRYPT_EMAIL=${EMAIL}
+
 mariadb:  
  image: mariadb
  container_name: "mariadb"
@@ -16,6 +45,18 @@ mariadb:
   - "127.0.0.1:3306:3306"
  volumes_from:
   - ghostData
+
+phpmyadmin:
+ image: phpmyadmin/phpmyadmin
+ container_name: "phpmyadmin"
+ links:
+  - mariadb:db
+ ports:
+  - 8007:80
+ environment:
+   - VIRTUAL_HOST=db-admin.${DOMAIN}
+   - LETSENCRYPT_HOST=db-admin.${DOMAIN}
+   - LETSENCRYPT_EMAIL=${EMAIL}
 
 influxdbData:
   container_name: "influxdbData"
@@ -67,9 +108,9 @@ ghost:
  volumes_from:
   - ghostData
  environment:
-  - VIRTUAL_HOST=www.${DOMAIN},${DOMAIN}
+  - VIRTUAL_HOST=www.${DOMAIN},${DOMAIN},blog.${DOMAIN}
   - NODE_ENV=production
-  - LETSENCRYPT_HOST=www.${DOMAIN},${DOMAIN}
+  - LETSENCRYPT_HOST=www.${DOMAIN},${DOMAIN},blog.${DOMAIN}
   - LETSENCRYPT_EMAIL=${EMAIL}
  env_file: ./data/conf/env_ghost
  links:
@@ -82,6 +123,9 @@ ghost-backup:
   - mariadb:mysql
  volumes_from:
   - ghostData
+  - ghostBackupData
+ environment:
+  - "BACKUP_TIME=0 0 3 ? * MON *"
 
 letsencrypt:
  image: jrcs/letsencrypt-nginx-proxy-companion
